@@ -51,3 +51,26 @@ One entry per decision: what was decided, alternatives, reason.
 - **Reason:** The assignment says both datasets share the 30-minute `startTime` axis and wants
   half-hour comparison; a step rule is simple to explain. Whether `startTime` means the start of the
   forecast hour is not stated in the API description, so the README must state this assumption.
+
+## D-005: Phase 2 tooling choices
+
+- **Date:** 2026-10-26
+- **Decision:**
+  - Frontend lint is **eslint** (typescript-eslint strict plus react-hooks), not the `oxlint` that the
+    Vite template ships, because `Claude.md` requires eslint. `strict` is set explicitly in
+    `tsconfig.app.json`.
+  - Backend runs on **Python 3.12** in Docker and CI, and in the local virtualenv, so all three match.
+    Dependencies use compatible-release ranges (`~=`) in `pyproject.toml`; `ruff` is pinned to a patch
+    range because new releases change lint rules.
+  - Frontend and backend are served same-origin in Docker: nginx serves the build and proxies `/api/`
+    to the backend. In development Vite proxies `/api` to `localhost:8000`.
+  - The `Makefile` needs GNU make, which is not installed on the Windows dev machine. CI and Linux use
+    it as is; locally the same commands run directly, and the Makefile syntax was checked in a container.
+  - The git identity guard (`scripts/check_identity.py`) reads personal strings from an untracked
+    `.identity-blocklist`, so the strings never enter the repository.
+- **Alternatives:** keep oxlint (faster, but contradicts the project rules); Python 3.14 locally
+  (newer, but differs from CI); a single `uv.lock` (exact pins, one more tool to explain in the video).
+- **Reason:** match `Claude.md`, keep local and CI behaviour identical, and keep the code easy to
+  explain line by line.
+- **Known issue:** Starlette prints a deprecation warning about its `httpx`-based test client. It is
+  third-party, harmless, and the five tests pass.

@@ -1,0 +1,49 @@
+[project]
+name = "wind-forecast-portal-backend"
+version = "0.1.0"
+description = "API for the UK day-ahead wind forecast portal."
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi~=0.162",
+    "uvicorn~=0.54",
+    "httpx~=0.28",
+    "tzdata>=2026.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest~=9.1",
+    "pytest-cov~=7.1",
+    "respx~=0.23",
+    "ruff~=0.17.2",
+    "mypy~=2.4",
+]
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["app"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "N", "SIM"]
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.mypy]
+strict = true
+files = ["app", "tests"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "--cov=app --cov-report=term-missing --cov-fail-under=90"
+
+[tool.coverage.run]
+source = ["app"]

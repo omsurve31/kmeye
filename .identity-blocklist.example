@@ -1,0 +1,5 @@
+# Copy to `.identity-blocklist` (git-ignored) and list strings that must never be committed,
+# one per line: your real name, email address, GitHub or LinkedIn handles, college name.
+# Matching is case-insensitive.
+your-real-name
+you@your-real-domain.example
