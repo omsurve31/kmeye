@@ -88,3 +88,21 @@ Result for all 31 delivery days (2 Jan to 1 Feb), cutoffs 1 Jan to 31 Jan:
   (horizon 16.5 to 39.5 hours).
 - Forecast values range from 2,292 to 21,353 MW; actuals from 1,695 to 17,805 MW.
 - A second live run produced a byte-identical file.
+
+## First accuracy results (Phase 4 sanity check)
+
+The new selection and metrics modules were run on the snapshot with the default cutoff (09:00 UK on
+D-1) and checked against an independent brute-force calculation. Both agree exactly.
+
+- 744 hourly forecasts selected, all from the 07:30 publish; 1,488 half-hour pairs.
+- MAE 2,042 MW, RMSE 2,509 MW, bias -1,748 MW, normalised MAE 18.1% (mean actual 11,284 MW).
+- Error percentiles: P5 -5,310, P10 -4,140, P50 -1,592, P90 +544, P95 +1,105 MW.
+- 84.7% of half-hours were **over-forecast** (actual below forecast), the costly direction for a buyer.
+- Accuracy gets worse with lead time: MAE 1,665 MW for forecasts 0–6 h ahead, 2,337 MW at 42–48 h.
+- A later cutoff helps: MAE 2,020 MW at 06:00, 2,042 MW at 09:00, 1,904 MW at 12:00, 1,830 MW at 23:00.
+- Worst day: 28 Jan 2026, MAE 5,375 MW.
+
+Caution: a persistent -1.7 GW bias is large. The two datasets may not cover exactly the same wind
+output (for example embedded wind or curtailment), so the size of the bias should be stated as
+"forecast versus metered outturn" and checked before it is presented as forecaster skill
+(see `docs/FUTURE_WORK.md`).

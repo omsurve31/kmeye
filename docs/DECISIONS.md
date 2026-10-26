@@ -96,3 +96,31 @@ One entry per decision: what was decided, alternatives, reason.
   negative horizon, 2,360 outside window); 1,488 of 1,488 actual half-hours kept, none missing.
 - **Consequences:** pandas is still not needed. The selection and metrics code can read the snapshot
   with `app.snapshot.read_snapshot`.
+
+## D-007: Decision-time selection and accuracy metrics
+
+- **Date:** 2026-10-26
+- **Decision:**
+  - **Cutoff:** for delivery day D the cutoff is 09:00 UK time on D-1 (`DEFAULT_CUTOFF_TIME_UK`, a
+    parameter everywhere). It is converted from UK local time to UTC with `zoneinfo`, so it stays
+    right across clock changes. A forecast published exactly at the cutoff is allowed; one second
+    later is never used.
+  - **Selection:** per target hour, the latest eligible publish. Hours with no eligible forecast
+    are left out, not filled from a later forecast.
+  - **Pairing (D-004):** each hourly forecast is paired with both of its half-hour actuals. The
+    horizon is publish time to the forecast's own target hour, so both half-hours share it.
+  - **Error:** `actual - forecast`, in MW. Negative means over-forecast (the buyer is short).
+  - **Percentiles:** linear interpolation between neighbouring values, written in plain Python.
+  - **Normalised error:** MAE divided by mean actual, in percent. It is `None` if the mean actual is
+    zero. Plain MAPE is not used.
+  - **By horizon:** uses every published forecast of a target (not just the decision-time one), in
+    6-hour bins, because that is what shows accuracy getting worse with lead time.
+  - **Empty input:** `summarise_errors` raises `NoDataError`; breakdowns of nothing return `[]`.
+  - **Uncertainty band (planned for the API):** forecast plus the P10 and P90 error of the same
+    UK hour of day. It is built from the same January data it is shown for, so it is in-sample
+    (see `docs/FUTURE_WORK.md`).
+- **Alternatives:** pandas or numpy (shorter, but hides the formulas the video must explain);
+  nearest-rank percentiles (simpler, but coarser with about 1,500 points); filling missing hours
+  from the next forecast (would leak information the buyer did not have).
+- **Reason:** every rule is a few lines of pure Python, tested against hand-computed examples, with
+  100% line coverage enforced per file in `make test-backend`.

@@ -37,3 +37,20 @@ FORECAST_PUBLISH_TO_UTC = DELIVERY_WINDOW_END_UTC
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 SNAPSHOT_PATH = DATA_DIR / "snapshot.json.gz"
+
+# Decision rule (docs/DECISIONS.md D-007). Assumption: the buyer decides at this UK local time on
+# the day before delivery. Real day-ahead gate closures differ by venue.
+UK_TIMEZONE_NAME = "Europe/London"
+DEFAULT_CUTOFF_TIME_UK = time(9, 0)
+# WINDFOR is hourly and FUELHH is half-hourly, so one forecast covers two actual half-hours (D-004).
+HALF_HOURS_PER_FORECAST_HOUR = 2
+
+# Accuracy metrics.
+PERCENT_SCALE = 100.0
+HISTOGRAM_BIN_WIDTH_MW = 500.0
+HORIZON_BIN_HOURS = 6.0
+PERCENTILE_5 = 5.0
+PERCENTILE_10 = 10.0
+PERCENTILE_50 = 50.0
+PERCENTILE_90 = 90.0
+PERCENTILE_95 = 95.0

@@ -14,6 +14,7 @@ test: test-backend test-frontend
 
 test-backend:
 	cd backend && python -m pytest --cov-report=xml
+	cd backend && python -m coverage report --include="*/forecast_selection.py,*/metrics.py" --fail-under=100
 
 test-frontend:
 	cd frontend && npm test
