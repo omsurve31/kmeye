@@ -74,3 +74,25 @@ One entry per decision: what was decided, alternatives, reason.
   explain line by line.
 - **Known issue:** Starlette prints a deprecation warning about its `httpx`-based test client. It is
   third-party, harmless, and the five tests pass.
+
+## D-006: Ingestion cleaning rules and snapshot format
+
+- **Date:** 2026-10-26
+- **Decision:** `python -m app.ingest` fetches in weekly chunks and writes
+  `backend/data/snapshot.json.gz` (gzip JSON, 89 KB). Rows are dropped, and counted in the snapshot,
+  for these reasons, checked in this order:
+  - actuals: not `WIND`, null generation, outside the delivery window, duplicate `startTime`;
+  - forecasts: null generation, target hour outside the delivery window, **negative horizon**
+    (published after the target hour started), duplicate `(publishTime, startTime)`.
+  The first copy of a duplicate wins. A malformed row stops the run with a clear error and nothing is
+  written. The file has a constant gzip header, so identical data gives identical bytes (verified by a
+  second live run). Retries cover timeouts, network errors, 429 and 5xx, three attempts with doubling
+  backoff.
+- **Alternatives:** keep negative-horizon rows and let selection ignore them (3,697 extra rows, but they
+  can never be chosen for a day-ahead cutoff); Parquet or CSV (D-003); keep the latest revision of a
+  duplicate actual (no revisions were observed, so extra complexity for no data).
+- **Reason:** smallest file that still supports selection, metrics and by-horizon charts, with every
+  drop visible in the snapshot audit. Real run: 20,440 forecast rows fetched, 14,383 kept (3,697
+  negative horizon, 2,360 outside window); 1,488 of 1,488 actual half-hours kept, none missing.
+- **Consequences:** pandas is still not needed. The selection and metrics code can read the snapshot
+  with `app.snapshot.read_snapshot`.

@@ -47,3 +47,7 @@ addopts = "--cov=app --cov-report=term-missing --cov-fail-under=90"
 
 [tool.coverage.run]
 source = ["app"]
+
+[tool.coverage.report]
+# The command-line launcher line is one statement that only runs outside tests.
+exclude_also = ["if __name__ == .__main__.:"]

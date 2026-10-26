@@ -1,0 +1,9 @@
+[
+  {"dataset": "FUELHH", "publishTime": "2026-01-02T00:30:00Z", "startTime": "2026-01-02T00:00:00Z", "settlementDate": "2026-01-02", "settlementPeriod": 1, "fuelType": "WIND", "generation": 14000},
+  {"dataset": "FUELHH", "publishTime": "2026-01-02T01:00:00Z", "startTime": "2026-01-02T00:30:00Z", "settlementDate": "2026-01-02", "settlementPeriod": 2, "fuelType": "WIND", "generation": 14100},
+  {"dataset": "FUELHH", "publishTime": "2026-01-02T00:30:00Z", "startTime": "2026-01-02T00:00:00Z", "settlementDate": "2026-01-02", "settlementPeriod": 1, "fuelType": "CCGT", "generation": 5000},
+  {"dataset": "FUELHH", "publishTime": "2026-01-02T00:30:00Z", "startTime": "2026-01-02T00:00:00Z", "settlementDate": "2026-01-02", "settlementPeriod": 1, "fuelType": "WIND", "generation": 14000},
+  {"dataset": "FUELHH", "publishTime": "2026-01-02T00:00:00Z", "startTime": "2026-01-01T23:30:00Z", "settlementDate": "2026-01-01", "settlementPeriod": 48, "fuelType": "WIND", "generation": 13000},
+  {"dataset": "FUELHH", "publishTime": "2026-02-02T00:00:00Z", "startTime": "2026-02-01T23:30:00Z", "settlementDate": "2026-02-01", "settlementPeriod": 48, "fuelType": "WIND", "generation": 5302},
+  {"dataset": "FUELHH", "publishTime": "2026-01-02T01:30:00Z", "startTime": "2026-01-02T01:00:00Z", "settlementDate": "2026-01-02", "settlementPeriod": 3, "fuelType": "WIND", "generation": null}
+]

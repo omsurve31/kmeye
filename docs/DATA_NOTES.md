@@ -72,4 +72,19 @@ Result for all 31 delivery days (2 Jan to 1 Feb), cutoffs 1 Jan to 31 Jan:
   useful publish is about 30 Dec (66.5 h before 2 Jan 00:00).
 - `tzdata` is needed: Python's `zoneinfo` fails on Windows without it (`No time zone found with
   key Europe/London`). It must be a backend dependency (D-003).
-- Rows with a negative horizon are dropped or ignored by the selection step, never used.
+- Rows with a negative horizon are dropped at ingest (D-006), so selection never sees them.
+
+## Snapshot built in Phase 3
+
+`python -m app.ingest` was run against the live API on 2026-10-26 and wrote
+`backend/data/snapshot.json.gz` (89 KB).
+
+- Forecasts: 20,440 rows fetched, **14,383 kept**. Dropped: 3,697 negative horizon, 2,360 outside the
+  delivery window. No nulls and no duplicates.
+- Actuals: 1,488 rows fetched, **1,488 kept**, 0 missing half-hours.
+- All 744 delivery hours (31 days x 24) have 15 to 23 forecasts each.
+- Re-checked on the snapshot: for every delivery day 2 Jan – 1 Feb, all 24 hours have a forecast
+  published at or before 09:00 UTC on D-1. The 07:30 publish is the one selected for all 744 hours
+  (horizon 16.5 to 39.5 hours).
+- Forecast values range from 2,292 to 21,353 MW; actuals from 1,695 to 17,805 MW.
+- A second live run produced a byte-identical file.

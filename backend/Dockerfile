@@ -4,6 +4,7 @@ WORKDIR /app
 
 COPY pyproject.toml ./
 COPY app ./app
+COPY data ./data
 RUN pip install --no-cache-dir .
 
 # Run as an unprivileged user.
