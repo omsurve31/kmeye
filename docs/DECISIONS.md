@@ -159,3 +159,36 @@ One entry per decision: what was decided, alternatives, reason.
   (FastAPI's convention for invalid parameters is 422).
 - **Reason:** keeps handlers short enough to explain line by line, makes every response checkable by
   hand against a tiny fixture, and gives the frontend one error shape to handle.
+
+## D-009: Frontend design and structure
+
+- **Date:** 2026-10-26
+- **Decision:**
+  - **Stack:** React 19, strict TypeScript, Vite, Recharts, plain `fetch`. No router (two views, tab
+    state in `App`) and no data-fetching library.
+  - **Data loading:** one small hook, `useApiData`, takes a loader and returns loading, error or
+    success. State is set only when a request finishes, and a result is shown only if it still
+    matches the current request, so a late answer to an old request can never replace the current one.
+    The accuracy view loads its six datasets together, so it has one loading state and one error state.
+  - **Contract:** `src/api/client.ts` is the only place that turns the API's `snake_case` into
+    `camelCase`. API response shapes are trusted rather than re-validated at run time, because the
+    backend tests pin them.
+  - **Shared assumptions:** one cutoff for both views, and each view remembers its own day or range
+    when the user switches tab.
+  - **Charts:** forecast in blue (a solid step line, because the forecast is hourly), actual outturn in
+    orange (dashed), the typical range as a blue wash. Error polarity uses red for "forecast too high"
+    and blue for "too low", with a legend and tooltip text so colour is never the only cue. The two
+    series colours were checked with the dataviz palette validator in light and dark mode. Every chart
+    has a legend, an accessible description and a "view data as a table" disclosure.
+  - **Cutoff control:** hour and minute selects (24-hour) instead of the browser's time input, which
+    showed AM/PM on some computers and clashed with the UK 24-hour times used everywhere else.
+  - **Axis:** the MW axis of the two time-series charts uses round numbers instead of Recharts' default
+    ticks, which gave steps such as 5,500.
+  - **Theme:** follows the operating system (light or dark); there is no toggle.
+- **Alternatives:** React Router (no second page to link to); React Query (more to explain for two
+  fetch patterns); a runtime schema library such as Zod (extra dependency, backend tests already pin the
+  shapes); the native time input (locale-dependent display).
+- **Reason:** small, explainable code for the video, with the buyer's two questions and the key
+  assumptions (cutoff, error sign, backward-looking evidence) always visible.
+- **Known limits:** the production bundle is about 640 kB (190 kB gzipped) because of Recharts (a build
+  warning, accepted for a pilot); chart tests check the legend, labels and drawn lines, not pixels.
