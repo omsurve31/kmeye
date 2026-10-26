@@ -45,6 +45,21 @@ DEFAULT_CUTOFF_TIME_UK = time(9, 0)
 # WINDFOR is hourly and FUELHH is half-hourly, so one forecast covers two actual half-hours (D-004).
 HALF_HOURS_PER_FORECAST_HOUR = 2
 
+# API. The cutoff is sent as HH:MM UK time, for example 09:00.
+DEFAULT_CUTOFF_TEXT = "09:00"
+CUTOFF_TEXT_FORMAT = "%H:%M"
+CUTOFF_PATTERN = r"^([01]\d|2[0-3]):[0-5]\d$"
+HALF_HOURS_PER_DAY = 48
+# Results are cached per cutoff. Cutoffs come from clients (1,440 possible values), so the cache is
+# bounded to stop a client from using up memory by trying them all.
+MAX_CACHED_CUTOFFS = 32
+MINUTES_PER_HOUR = 60
+ERROR_DEFINITION = (
+    "Error = actual - forecast, in MW. A negative error means the forecast was too high "
+    "(over-forecast), so the buyer is short. A positive error means the forecast was too low "
+    "(surplus wind)."
+)
+
 # Accuracy metrics.
 PERCENT_SCALE = 100.0
 HISTOGRAM_BIN_WIDTH_MW = 500.0

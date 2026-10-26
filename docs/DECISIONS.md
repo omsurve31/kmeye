@@ -124,3 +124,38 @@ One entry per decision: what was decided, alternatives, reason.
   from the next forecast (would leak information the buyer did not have).
 - **Reason:** every rule is a few lines of pure Python, tested against hand-computed examples, with
   100% line coverage enforced per file in `make test-backend`.
+
+## D-008: API design
+
+- **Date:** 2026-10-26
+- **Decision:**
+  - **Endpoints:** `GET /api/meta`, `/decision`, `/accuracy/summary`, `/accuracy/series`,
+    `/accuracy/by-hour`, `/accuracy/by-day`, `/accuracy/by-horizon`, `/accuracy/distribution`, plus
+    the existing `/health`. Query parameters are `day`, `from`, `to` (delivery days, ISO dates) and
+    `cutoff` (`HH:MM` UK time, default `09:00`). `by-horizon` takes no cutoff because it uses every
+    published forecast.
+  - **Structure:** routes only validate input and call builders in `data_service.py`; the builders use
+    the pure functions from Phase 4. The snapshot is loaded once and injected as a FastAPI
+    dependency, so tests swap in a small snapshot.
+  - **Actuals are always returned** in the decision view. Every delivery day is in the past, and the
+    API never reads the current time, so results are repeatable.
+  - **Uncertainty band:** forecast plus the P10 and P90 error for the same UK hour of the day, from
+    the whole window at the same cutoff, never below 0 MW. It is `null` for an hour with no error
+    history.
+  - **New metric:** `abs_error_p90_mw`, the size of error that 90% of half-hours stayed within.
+  - **Status codes:** invalid input is 422 with one string `detail` that names the parameter and does
+    not echo the input; a valid request with no data (for example a cutoff before any forecast was
+    published) is 404; a missing or corrupt snapshot is 503 with a generic message, and the real
+    problem is only logged.
+  - **No authentication and no rate limiting:** the API is public, read-only, serves a fixed public
+    dataset and has bounded responses (at most 1,488 points). Rate limiting would belong at the
+    hosting edge (see `docs/FUTURE_WORK.md`).
+  - **Bounded cache (security fix found in review):** results are cached per cutoff, and a client picks
+    the cutoff (1,440 possible values), so an unbounded cache was a memory-exhaustion risk. It now
+    keeps at most 32 cutoffs and evicts the oldest; access is guarded by a lock because handlers run
+    in a thread pool. Covered by regression tests.
+- **Alternatives:** a database (not needed for a 90 KB read-only snapshot); returning FastAPI's default
+  list-shaped 422 body (inconsistent with our own errors and echoes the input); 400 instead of 422
+  (FastAPI's convention for invalid parameters is 422).
+- **Reason:** keeps handlers short enough to explain line by line, makes every response checkable by
+  hand against a tiny fixture, and gives the frontend one error shape to handle.

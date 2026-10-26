@@ -77,6 +77,14 @@ def select_decision_forecasts(
     return sorted(latest_by_target.values(), key=lambda forecast: forecast.start_time_utc)
 
 
+def half_hour_starts(forecast_start_utc: datetime) -> list[datetime]:
+    """Return the start of each half-hour that an hourly forecast covers (D-004)."""
+    return [
+        forecast_start_utc + timedelta(minutes=ACTUAL_HALF_HOUR_MINUTES * index)
+        for index in range(HALF_HOURS_PER_FORECAST_HOUR)
+    ]
+
+
 def pair_forecasts_with_actuals(
     forecasts: Iterable[ForecastRow], actuals: Iterable[ActualRow]
 ) -> list[ForecastActualPair]:
@@ -90,9 +98,7 @@ def pair_forecasts_with_actuals(
     pairs = []
     for forecast in forecasts:
         horizon_hours = (forecast.start_time_utc - forecast.publish_time_utc) / timedelta(hours=1)
-        for half_hour_index in range(HALF_HOURS_PER_FORECAST_HOUR):
-            offset = timedelta(minutes=ACTUAL_HALF_HOUR_MINUTES * half_hour_index)
-            target_start_utc = forecast.start_time_utc + offset
+        for target_start_utc in half_hour_starts(forecast.start_time_utc):
             if target_start_utc not in actual_mw_by_start:
                 continue
             pairs.append(

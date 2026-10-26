@@ -15,6 +15,8 @@ Nice-to-have items that are out of scope for the pilot. TODO comments in code mu
 
 ## Platform
 
+- **Rate limiting and security headers** (`X-Content-Type-Options`, `X-Frame-Options`,
+  `Referrer-Policy`) at the nginx or Vercel layer. The API itself is read-only and bounded.
 - **Live refresh** of the snapshot from Elexon behind an admin-only endpoint.
 - **Update GitHub Actions versions.** CI warns that `actions/checkout`, `setup-node`, `setup-python`
   and `upload-artifact` at the pinned versions run on the deprecated Node 20 runtime.
