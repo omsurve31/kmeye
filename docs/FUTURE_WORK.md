@@ -15,6 +15,8 @@ Nice-to-have items that are out of scope for the pilot. TODO comments in code mu
 
 ## Platform
 
+- **Code-split the charts** to bring the bundle under 500 kB, and add a light/dark theme toggle (the
+  theme currently follows the operating system).
 - **Rate limiting and security headers** (`X-Content-Type-Options`, `X-Frame-Options`,
   `Referrer-Policy`) at the nginx or Vercel layer. The API itself is read-only and bounded.
 - **Live refresh** of the snapshot from Elexon behind an admin-only endpoint.
