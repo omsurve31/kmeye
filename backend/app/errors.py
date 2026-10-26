@@ -11,3 +11,7 @@ class IngestError(Exception):
 
 class SnapshotError(Exception):
     """The data snapshot file is missing or unreadable."""
+
+
+class NoDataError(Exception):
+    """There is no data to compute the requested result from."""
