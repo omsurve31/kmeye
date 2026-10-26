@@ -7,6 +7,7 @@ import pytest
 from app.forecast_selection import (
     ForecastActualPair,
     compute_cutoff_utc,
+    half_hour_starts,
     pair_forecasts_with_actuals,
     select_decision_forecasts,
     uk_delivery_day,
@@ -201,6 +202,10 @@ def test_select_decision_forecasts_cutoff_follows_uk_summer_time() -> None:
 
 def test_select_decision_forecasts_empty_input_returns_empty_list() -> None:
     assert select_decision_forecasts([], DEFAULT_CUTOFF) == []
+
+
+def test_half_hour_starts_returns_the_hour_and_the_following_half_hour() -> None:
+    assert half_hour_starts(_utc(1, 2, 0)) == [_utc(1, 2, 0, 0), _utc(1, 2, 0, 30)]
 
 
 def test_pair_forecasts_with_actuals_applies_hourly_forecast_to_both_half_hours() -> None:

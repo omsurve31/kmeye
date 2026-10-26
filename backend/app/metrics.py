@@ -59,7 +59,8 @@ def summarise_errors(pairs: Sequence[ForecastActualPair]) -> ErrorSummary:
         raise NoDataError("no forecast/actual pairs to summarise")
     errors = sorted(pair.error_mw for pair in pairs)
     count = len(errors)
-    mae_mw = sum(abs(error) for error in errors) / count
+    absolute_errors = sorted(abs(error) for error in errors)
+    mae_mw = sum(absolute_errors) / count
     mean_actual_mw = sum(pair.actual_generation_mw for pair in pairs) / count
     # MAE as a share of mean output. Plain MAPE is avoided: wind output can be near zero, which
     # would make a per-half-hour percentage explode.
@@ -78,6 +79,7 @@ def summarise_errors(pairs: Sequence[ForecastActualPair]) -> ErrorSummary:
         error_p50_mw=percentile(errors, PERCENTILE_50),
         error_p90_mw=percentile(errors, PERCENTILE_90),
         error_p95_mw=percentile(errors, PERCENTILE_95),
+        abs_error_p90_mw=percentile(absolute_errors, PERCENTILE_90),
         over_forecast_fraction=sum(error < 0 for error in errors) / count,
     )
 

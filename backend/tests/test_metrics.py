@@ -81,6 +81,11 @@ def test_summarise_errors_over_forecast_fraction_counts_negative_errors() -> Non
     assert summarise_errors(FIVE_PAIRS).over_forecast_fraction == pytest.approx(0.4)
 
 
+def test_summarise_errors_abs_error_p90_ignores_error_direction() -> None:
+    # Absolute errors sorted [0, 10, 20, 30, 40]; position 3.6 -> 30 + 0.6 * 10 = 36
+    assert summarise_errors(FIVE_PAIRS).abs_error_p90_mw == pytest.approx(36.0)
+
+
 def test_summarise_errors_sample_count_is_number_of_pairs() -> None:
     assert summarise_errors(FIVE_PAIRS).sample_count == 5
 
